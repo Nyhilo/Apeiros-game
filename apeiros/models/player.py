@@ -4,6 +4,7 @@ from sqlalchemy import BLOB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
+from .medal import Medal
 
 
 class Player(Base):
@@ -24,20 +25,23 @@ class Player(Base):
     player_token = mapped_column(type_=BLOB, nullable=True)
 
     # Medal ids owned by this player. Is stored as a comma-separated list of ids
-    _medals: Mapped[str] = mapped_column('medals')
+    _medal_ids: Mapped[str] = mapped_column('medals')
 
     @property
-    def medals(self) -> List[str]:
+    def medal_ids(self) -> List[str]:
         return self._medals.split(',')
 
-    @medals.setter
-    def medals(self, medals) -> None:
+    @medal_ids.setter
+    def medal_ids(self, medals) -> None:
         # Sanitize ids for characters that are used in storage
         for medal in medals:
             if ',' in medal:
                 raise ValueError('Detected comma in medals list. Couldn\'t store list in database.')
 
         self._medals = ','.join(medals)
+
+    # Populated in by the database.py
+    medals: List[Medal]
 
     # Currency, in the form of points.
     points: Mapped[int]
