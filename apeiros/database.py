@@ -1,13 +1,9 @@
 from typing import List
 
 from sqlalchemy import create_engine, select
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import Session
 
-from .player import Player
-
-
-class Base(DeclarativeBase):
-    pass
+from .models import Base, Player
 
 
 class Database():
@@ -19,7 +15,7 @@ class Database():
         self.engine = create_engine(connectionString)
         Base.metadata.create_all(self.engine)
 
-        self.session = sessionmaker(bind=self.engine)
+        self.session = Session(self.engine)
 
     # Players #
     def add_player(self, player: Player):
