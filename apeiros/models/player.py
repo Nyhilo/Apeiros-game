@@ -1,10 +1,18 @@
 from typing import Optional, List, Dict, Any
 
-from sqlalchemy import BLOB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Table, Column, ForeignKey, BLOB
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .medal import Medal
+
+
+_player_medal_association_table = Table(
+    "apeiros_player_medals",
+    Base.metadata,
+    Column("player_id", ForeignKey('apeiros_players.id')),
+    Column("medal_id", ForeignKey('apeiros_medals.medal_id')),
+)
 
 
 class Player(Base):
@@ -24,24 +32,35 @@ class Player(Base):
     # A png byte blob
     player_token = mapped_column(type_=BLOB, nullable=True)
 
-    # Medal ids owned by this player. Is stored as a comma-separated list of ids
-    _medal_ids: Mapped[str] = mapped_column('medals')
+    # Medals owned by this player
+    medals: Mapped[List['Medal']] = relationship(secondary=_player_medal_association_table)
 
-    @property
-    def medal_ids(self) -> List[str]:
-        return self._medals.split(',')
 
-    @medal_ids.setter
-    def medal_ids(self, medals) -> None:
-        # Sanitize ids for characters that are used in storage
-        for medal in medals:
-            if ',' in medal:
-                raise ValueError('Detected comma in medals list. Couldn\'t store list in database.')
 
-        self._medals = ','.join(medals)
 
-    # Populated in by the database.py
-    medals: List[Medal]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # Currency, in the form of points.
     points: Mapped[int]
@@ -75,5 +94,5 @@ class Player(Base):
     def __repr__(self) -> str:
         return (
             f'Player(id={self.id!r}, unique_id={self.unique_id!r}, username={self.username!r}, '
-            f'nickname={self.nickname!r}, _medals={self._medals!r}, points={self.points!r}, _items={self._items!r})'
+            f'nickname={self.nickname!r}, medals={self.medals!r}, points={self.points!r}, _items={self._items!r})'
         )
