@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from .models import Base, Player, Medal
+from .models import Base, Player, Medal, Item
 
 
 class Database():
@@ -32,7 +32,7 @@ class Database():
             return self.session.scalars(select(Player).where(Player.unique_id.in_(unique_ids))).all()
 
     # Medals #
-    def update_medal(self, medal: Medal) -> None:
+    def upsert_medal(self, medal: Medal) -> None:
         self.session.merge(medal)
 
     def get_medal(self, medal_id: str) -> Medal:
@@ -40,3 +40,13 @@ class Database():
 
     def get_medals(self):
         return self.session.scalars(select(Medal)).all()
+
+    # Items #
+    def upsert_item(self, item: Item) -> None:
+        self.session.merge(item)
+
+    def get_item(self, item_id: str) -> Item:
+        return self.session.get(Item, item_id)
+
+    def get_items(self):
+        return self.session.scalars(select(Item)).all()

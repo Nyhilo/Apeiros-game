@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .medal import Medal
+from .item import Item
 
 
 _player_medal_association_table = Table(
@@ -13,6 +14,24 @@ _player_medal_association_table = Table(
     Column("player_id", ForeignKey('apeiros_players.id')),
     Column("medal_id", ForeignKey('apeiros_medals.medal_id')),
 )
+
+
+class PlayerItem(Base):
+    __tablename__ = 'apeiros_player_items'
+
+    # Foreign Keys
+    _player_id: Mapped[int] = mapped_column('player_id', ForeignKey('apeiros_players.id'), primary_key=True)
+    _item_id: Mapped[str] = mapped_column('item_id', ForeignKey('apeiros_items.item_id'), primary_key=True)
+
+    item: Mapped[Item] = relationship()
+
+    # Inventory data
+    amount: Mapped[int]
+
+    def __repr__(self):
+        return (
+            f'Item(player={self._player_id!r}, item_id={self._item_id!r}, item={self.item!r}, amount={self.amount!r})'
+        )
 
 
 class Player(Base):
@@ -35,64 +54,43 @@ class Player(Base):
     # Medals owned by this player
     medals: Mapped[List['Medal']] = relationship(secondary=_player_medal_association_table)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # Currency, in the form of points.
     points: Mapped[int]
 
     # Items owned by this player. This is a dictionary with item_ids as keys and the amount owned as values
-    _items: Mapped[str] = mapped_column('items')
-
-    @property
-    def items(self) -> Dict[str, int]:
-        pairs = self._items.split(',')
-        split_pairs = [pair.split(':') for pair in pairs]
-
-        return {pair[0]: int(pair[1]) for pair in split_pairs}
-
-    @items.setter
-    def items(self, items):
-        # Sanitize ids for characters that are used in storage
-        for key in items:
-            if ',' in key:
-                raise ValueError(f'Detected comma in items key "{key}". Couldn\'t store dictionary in database.')
-
-            if ':' in key:
-                raise ValueError(f'Detected colon in items key "{key}". Couldn\'t store dictionary in database.')
-
-        self._items = ','.join(f'{k}:{v}' for k, v in items.items())
+    inventory: Mapped[List['PlayerItem']] = relationship()
 
     # The nomsters owned by this player
     # TODO: This needs a relationship with a Nomster class
     # nomsters: Mapped[]
 
+    # Public Methods #
+    def add_item(self, item: Item):
+        '''Add an item to the inventory or increment the amount of an existing item'''
+        if existing := self.get_slot(item.item_id):
+            existing.amount += 1
+            return
+
+        self.inventory.append(PlayerItem(_player_id=self.id, _item_id=item.item_id, item=item, amount=1))
+
+    def remove_item(self, item: Item):
+        '''Decrement the amount of an existing item and remove it if there are none left'''
+        if existing := self.get_slot(item.item_id):
+            existing.amount -= 1
+
+            if existing.amount <= 0:
+                self.inventory.remove(existing)
+
+    def get_slot(self, item_id: str) -> PlayerItem:
+        '''Returns the inventory slot for an item. Use slot.item to interrogate the item details'''
+        for pItem in self.inventory:
+            if pItem.item.item_id == item_id:
+                return pItem
+
+        return None
+
     def __repr__(self) -> str:
         return (
             f'Player(id={self.id!r}, unique_id={self.unique_id!r}, username={self.username!r}, '
-            f'nickname={self.nickname!r}, medals={self.medals!r}, points={self.points!r}, _items={self._items!r})'
+            f'nickname={self.nickname!r}, medals={self.medals!r}, points={self.points!r}, items={self.inventory!r})'
         )

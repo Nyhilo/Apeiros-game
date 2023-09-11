@@ -1,5 +1,5 @@
 from .database import Database
-from .models import Player, Medal
+from .models import Player, Medal, Item
 
 
 class Game():
