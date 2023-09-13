@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .medal import Medal
 from .item import Item
+from .nomster import Nomster
 
 
 _player_medal_association_table = Table(
@@ -52,17 +53,16 @@ class Player(Base):
     player_token = mapped_column(type_=BLOB, nullable=True)
 
     # Medals owned by this player
-    medals: Mapped[List['Medal']] = relationship(secondary=_player_medal_association_table)
+    medals: Mapped[List[Medal]] = relationship(secondary=_player_medal_association_table)
 
     # Currency, in the form of points.
     points: Mapped[int]
 
     # Items owned by this player. This is a dictionary with item_ids as keys and the amount owned as values
-    inventory: Mapped[List['PlayerItem']] = relationship()
+    inventory: Mapped[List[PlayerItem]] = relationship()
 
     # The nomsters owned by this player
-    # TODO: This needs a relationship with a Nomster class
-    # nomsters: Mapped[]
+    nomsters: Mapped[List[Nomster]] = relationship(back_populates='owner', foreign_keys=Nomster.owner_id)
 
     # Public Methods #
     def add_item(self, item: Item):
