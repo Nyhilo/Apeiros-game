@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from .models import Base, Player, Medal, Item
+from .models import Base, Player, Medal, Item, Species, Nomster
 
 
 class Database():
@@ -24,7 +24,7 @@ class Database():
     def get_player(self, unique_id: str) -> Player:
         return self.session.scalar(select(Player).where(Player.unique_id == unique_id))
 
-    def get_players(self, unique_ids: List[str] | None) -> List[Player]:
+    def get_player_list(self, unique_ids: List[str] | None) -> List[Player]:
         if unique_ids is None:
             return self.session.scalars(select(Player)).all()
 
@@ -38,7 +38,7 @@ class Database():
     def get_medal(self, medal_id: str) -> Medal:
         return self.session.get(Medal, medal_id)
 
-    def get_medals(self):
+    def get_medal_list(self):
         return self.session.scalars(select(Medal)).all()
 
     # Items #
@@ -48,5 +48,31 @@ class Database():
     def get_item(self, item_id: str) -> Item:
         return self.session.get(Item, item_id)
 
-    def get_items(self):
+    def get_item_list(self) -> List[Item]:
         return self.session.scalars(select(Item)).all()
+
+    # Nomster Species #
+    def upsert_species(self, species: Species) -> None:
+        self.session.merge(species)
+
+    def get_species(self, species_id: int) -> Species:
+        return self.session.get(Species, species_id)
+
+    def get_species_list(self) -> List[Species]:
+        return self.session.scalars(select(Species)).all()
+
+    # TODO: Implement extra helper database methods
+    # def get_species_by_type(self, type: NomsterType) -> Species
+    # def get_species_list_by_location(self, x: int, y: int) -> List[Species]
+
+    # Nomsters #
+    def add_nomster(self, nomster: Nomster) -> None:
+        self.session.add(nomster)
+
+    def get_nomster(self, nomster_id: int) -> Nomster:
+        self.session.get(Nomster, nomster_id)
+
+    def get_player_nomsters(self, player: int | Player) -> List[Nomster]:
+        player_id = player if type(player) is int else player.id
+
+        return self.session.scalars(select(Nomster).where(Nomster.owner_id == player_id)).all()
