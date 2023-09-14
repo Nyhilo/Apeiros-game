@@ -85,4 +85,4 @@ class Database():
         self.session.add(location)
 
     def get_location(self, x: int, y: int) -> Location:
-        return self.session.get(Location, (0, 0))   # (x, y)
+        return self.session.get(Location, (x, y))
