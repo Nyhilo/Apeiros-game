@@ -4,7 +4,10 @@
 from enum import Enum
 
 
-class LocationType(str, Enum):
+class NomsterType(str, Enum):
+
+    # NOTE: If a member gets added to this list, also add it to the LocationTags enum below
+
     Heat = 'Heat'
     Electricity = 'Electricity'
     Plant = 'Plant'
@@ -17,22 +20,6 @@ class LocationType(str, Enum):
     Dark = 'Dark'
 
 
-class NomsterType(str, Enum):
-    # We want to strive to have these two enums in parity, while preserving the
-    # clarity in code when using them.
-    # In the future, consider a naming refactor for "ElementType" to fuse these
-    Heat = LocationType.Heat
-    Electricity = LocationType.Electricity
-    Plant = LocationType.Plant
-    Air = LocationType.Air
-    Light = LocationType.Light
-    Cold = LocationType.Cold
-    Water = LocationType.Water
-    Metal = LocationType.Metal
-    Land = LocationType.Land
-    Dark = LocationType.Dark
-
-
 class NomsterClass(str, Enum):
     Amphibian = 'Amphibian'
     Arthropoid = 'Arthropoid'
@@ -40,3 +27,32 @@ class NomsterClass(str, Enum):
     Piscine = 'Piscine'
     Mammalian = 'Mammalian'
     Reptilian = 'Reptilian'
+
+
+class LocationTag(str, Enum):
+    # We continue to use strings here instead of a potentially more rational
+    # bit-enum so that it will be easier to interrogate on the database. We
+    # aren't going to be storing a very large number of tiles, so we aren't
+    # concerned about wasting some data space on redundancy
+
+    # The set of elemental types should always be the same as the set of nomster types
+    Heat = NomsterType.Heat
+    Electricity = NomsterType.Electricity
+    Plant = NomsterType.Plant
+    Air = NomsterType.Air
+    Light = NomsterType.Light
+    Cold = NomsterType.Cold
+    Water = NomsterType.Water
+    Metal = NomsterType.Metal
+    Land = NomsterType.Land
+    Dark = NomsterType.Dark
+
+    # Development state of the tile. A location will typically not have both of these at the same time
+    Wild = 'Wild'
+    Populated = 'Populated'
+
+    # Further development states for populated tiles
+    Hospitable = 'Hospitable'
+    Buildable = 'Buildable'
+    Farm = 'Farm'
+    Civilized = 'Civilized'
