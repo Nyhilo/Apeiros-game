@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from .models import Base, Player, Medal, Item, Species, Nomster
+from .models import Base, Player, Medal, Item, Species, Nomster, Location
 
 
 class Database():
@@ -76,3 +76,13 @@ class Database():
         player_id = player if type(player) is int else player.id
 
         return self.session.scalars(select(Nomster).where(Nomster.owner_id == player_id)).all()
+
+    # Locations #
+    def add_location(self, location: Location) -> None:
+        if self.get_location(location.location_x, location.location_y) is not None:
+            raise ValueError('A location already exists at that set of coordinates')
+
+        self.session.add(location)
+
+    def get_location(self, x: int, y: int) -> Location:
+        return self.session.get(Location, (x, y))
