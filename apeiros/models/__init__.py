@@ -12,4 +12,4 @@ from .player import Player
 from .medal import Medal
 from .item import Item
 from .nomster import Species, Nomster
-from .location import Location
+from .location import Location, Tile, Card, LocationProposal

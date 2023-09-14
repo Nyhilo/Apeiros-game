@@ -36,11 +36,18 @@ class Location(Base):
     details: Mapped[str]
 
     # Png byte blobs
-    tile_id: Mapped[Optional[int]] = mapped_column(ForeignKey('apeiros_location_tiles.id'))
-    tile_image: Mapped[Optional[Tile]] = relationship()
+    tile_id: Mapped[int] = mapped_column(ForeignKey('apeiros_location_tiles.id'))
+    tile_image: Mapped[Tile] = relationship()
 
-    card_id: Mapped[Optional[int]] = mapped_column(ForeignKey('apeiros_location_cards.id'))
-    card_image: Mapped[Optional[Card]] = relationship()
+    card_id: Mapped[int] = mapped_column(ForeignKey('apeiros_location_cards.id'))
+    card_image: Mapped[Card] = relationship()
+
+    # Proposal Details
+    tile_submitter_id: Mapped[int] = mapped_column(ForeignKey('apeiros_players.id'))
+    tile_submitter = relationship('Player', foreign_keys=tile_submitter_id)
+
+    submission_fulfiller_id: Mapped[int] = mapped_column(ForeignKey('apeiros_players.id'))
+    submission_fulfiller = relationship('Player', foreign_keys=submission_fulfiller_id)
 
     # Terrain tags, stored as a comma-separated string
     _tags: Mapped[str] = mapped_column('tags', default='')
@@ -84,3 +91,17 @@ class Location(Base):
     def __repr__(self):
         return (f'Location(name={self.name!r}, details={self.details!r}, x={self.location_x}, y={self.location_y}, '
                 f'tags={self._unpack_tags()!r})')
+
+
+class LocationProposal(Base):
+    '''Used for the image half of a location proposal.'''
+
+    __tablename__ = 'apeiros_location_proposals'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    tile_id: Mapped[int] = mapped_column(ForeignKey('apeiros_location_tiles.id'))
+    tile_image: Mapped[Tile] = relationship()
+
+    submitter_id: Mapped[int] = mapped_column(ForeignKey('apeiros_players.id'))
+    submitter = relationship('Player')
