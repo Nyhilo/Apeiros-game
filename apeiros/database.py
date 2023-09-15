@@ -24,7 +24,7 @@ class Database():
     def get_player(self, unique_id: str) -> Player:
         return self.session.scalar(select(Player).where(Player.unique_id == unique_id))
 
-    def get_player_list(self, unique_ids: List[str] | None) -> List[Player]:
+    def get_player_list(self, unique_ids: List[str] = None) -> List[Player]:
         if unique_ids is None:
             return self.session.scalars(select(Player)).all()
 
