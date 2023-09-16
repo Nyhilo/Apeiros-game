@@ -46,7 +46,7 @@ class Player(Base):
     unique_id: Mapped[str]
 
     # User identifying names that will be rendered to the user
-    username: Mapped[str]
+    username: Mapped[Optional[str]]
     nickname: Mapped[Optional[str]]
 
     # A png byte blob

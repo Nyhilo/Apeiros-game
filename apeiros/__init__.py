@@ -5,4 +5,7 @@ This file defines the public interface for the game.
 '''
 
 from .game import setup_database
-from .player import create_player
+from .player import (
+    create_player,
+    get_player_name
+)

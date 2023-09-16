@@ -22,8 +22,6 @@ def setup_database(connectionString: str = None) -> None:
 
     _db = Database(_connectionString)
 
-    print(_db)
-
 
 def db() -> Database:
     return _db
