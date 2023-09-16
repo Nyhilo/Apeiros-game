@@ -3,10 +3,10 @@ from typing import Optional, List, Dict, Any
 from sqlalchemy import Table, Column, ForeignKey, BLOB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
-from .medal import Medal
-from .item import Item
-from .nomster import Nomster
+from .base_model import Base
+from .medal_model import Medal
+from .item_model import Item
+from .nomster_model import Nomster
 
 
 _player_medal_association_table = Table(
@@ -46,7 +46,7 @@ class Player(Base):
     unique_id: Mapped[str]
 
     # User identifying names that will be rendered to the user
-    username: Mapped[str]
+    username: Mapped[Optional[str]]
     nickname: Mapped[Optional[str]]
 
     # A png byte blob
