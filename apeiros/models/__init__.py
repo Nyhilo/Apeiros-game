@@ -5,11 +5,11 @@ include the relevant import in this file.
 Then access the model with `from models import <MyModel>`
 '''
 
-from .base import Base
+from .base_model import Base
 from .enums import LocationTag, NomsterType, NomsterClass
 
-from .player import Player
-from .medal import Medal
-from .item import Item
-from .nomster import Species, Nomster
-from .location import Location, Tile, Card, LocationProposal
+from .player_model import Player
+from .medal_model import Medal
+from .item_model import Item
+from .nomster_model import Species, Nomster
+from .location_model import Location, Tile, Card, LocationProposal
