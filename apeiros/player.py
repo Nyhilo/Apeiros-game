@@ -11,21 +11,28 @@ def create_player(
         autocrop: bool = False
 ) -> None:
     '''
-    !!Use check_square() before submitting an image through this method.!!
+    !! Use check_square() before submitting an image through this method. !!
+
     Create a new player in the database. unique_id, username, and nickname may
-     be None, with some restrictions:
+    be None, with some restrictions:
+
     Both a unique_id and username MAY be given (and SHOULD be if available),
-     but one OR the other MUST be given.
+    but one OR the other MUST be given.
+
     If a unique_id is given but a username is not, then a nickname MUST be.
+
     All values not specified MUST be given as None, for clarity.
 
     Args:
-        unique_id (str | None): A unique internal ID, such as a discord User ID
-        username (str | None):  A unique username. Will be displayed when
-                                 claridy between useres is desired.
-        nickname (str | None):  A nickname. Takes precedence over username for
-                                 identifying the user.
-        player_token (bytes):   A square png. Maximum size of 200kb.
+        unique_id (str | None):
+            A unique internal ID, such as a discord User ID
+        username (str | None):
+            A unique username. Will be displayed when clarity between useres is
+            desired.
+        nickname (str | None):
+            A nickname. Takes precedence over username for identifying the user.
+        player_token (bytes):
+            A square png. Maximum size of 200kb.
     '''
     # Sanitize identifiers
     unique_id, username, nickname = _handle_user_identifiers(unique_id, username, nickname)
