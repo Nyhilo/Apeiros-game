@@ -16,31 +16,31 @@ class Tile(Base):
     image = mapped_column(type_=BLOB)
 
 
-class Card(Base):
-    __tablename__ = 'apeiros_location_cards'
+# class Card(Base):
+#     __tablename__ = 'apeiros_location_cards'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+#     id: Mapped[int] = mapped_column(primary_key=True)
 
-    image = mapped_column(type_=BLOB)
+#     image = mapped_column(type_=BLOB)
 
 
 class Location(Base):
     __tablename__ = 'apeiros_locations'
 
     # There can only be one location per coordinate, so they are the primary keys
-    location_x: Mapped[int] = mapped_column(primary_key=True)
-    location_y: Mapped[int] = mapped_column(primary_key=True)
+    x: Mapped[int] = mapped_column(primary_key=True)
+    y: Mapped[int] = mapped_column(primary_key=True)
 
     # Details
     name: Mapped[str]
-    details: Mapped[str]
+    description: Mapped[str]
 
     # Png byte blobs
     tile_id: Mapped[int] = mapped_column(ForeignKey('apeiros_location_tiles.id'))
     tile_image: Mapped[Tile] = relationship()
 
-    card_id: Mapped[int] = mapped_column(ForeignKey('apeiros_location_cards.id'))
-    card_image: Mapped[Card] = relationship()
+    # card_id: Mapped[int] = mapped_column(ForeignKey('apeiros_location_cards.id'))
+    # card_image: Mapped[Card] = relationship()
 
     # Proposal Details
     tile_submitter_id: Mapped[int] = mapped_column(ForeignKey('apeiros_players.id'))
@@ -105,3 +105,5 @@ class LocationProposal(Base):
 
     submitter_id: Mapped[int] = mapped_column(ForeignKey('apeiros_players.id'))
     submitter = relationship('Player')
+
+    # TODO: Add column to track time created.

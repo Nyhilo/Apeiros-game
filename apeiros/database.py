@@ -79,10 +79,13 @@ class Database():
 
     # Locations #
     def add_location(self, location: Location) -> None:
-        if self.get_location(location.location_x, location.location_y) is not None:
+        if self.get_location(location.x, location.y) is not None:
             raise ValueError('A location already exists at that set of coordinates')
 
         self.session.add(location)
 
     def get_location(self, x: int, y: int) -> Location:
         return self.session.get(Location, (x, y))
+
+    def get_location_list(self) -> List[Location]:
+        return self.session.scalars(select(Location)).all()

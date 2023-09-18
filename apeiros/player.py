@@ -9,7 +9,7 @@ def create_player(
         nickname: str | None,
         player_token: bytes,
         autocrop: bool = False
-) -> None:
+) -> Player:
     '''
     !! Use check_square() before submitting an image through this method. !!
 
@@ -33,6 +33,7 @@ def create_player(
             A nickname. Takes precedence over username for identifying the user.
         player_token (bytes):
             A square png. Maximum size of 200kb.
+
     '''
     # Sanitize identifiers
     unique_id, username, nickname = _handle_user_identifiers(unique_id, username, nickname)
@@ -51,6 +52,8 @@ def create_player(
         nomsters=[]
     )
     db().add_player(player)
+
+    return player
 
 
 def get_player_name(unique_id: str) -> str:

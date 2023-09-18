@@ -32,6 +32,7 @@ def check_square(image: bytes) -> (int, int):
     return diff, percent
 
 
+# TODO: Consider supporting/using WebP instead
 def convert_png(image: bytes) -> bytes:
     '''
     Converts an image from a format supported by PIL (jpg, etc.) to a png.

@@ -12,4 +12,4 @@ from .player_model import Player
 from .medal_model import Medal
 from .item_model import Item
 from .nomster_model import Species, Nomster
-from .location_model import Location, Tile, Card, LocationProposal
+from .location_model import Location, Tile, LocationProposal
