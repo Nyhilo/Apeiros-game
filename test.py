@@ -1,7 +1,8 @@
 # Sample game setup #
 
 from apeiros import setup_database, create_player, get_player_name, check_square, \
-    convert_png, autocrop
+    convert_png, autocrop, create_location, create_location_proposal
+from apeiros.exceptions import LocationOverlapError
 
 
 def printn(m):
@@ -13,6 +14,9 @@ setup_database()
 
 with open('test.jpg', 'rb') as f:
     player_image = f.read()
+
+with open('location.webp', 'rb') as f:
+    location_image = f.read()
 
 
 printn('Ensure that the player image is a png')
@@ -38,9 +42,20 @@ create_player(str(id), 'newPlayer', None, player_image)
 print('expected: newPlayer got: ' + get_player_name(str(id)))
 
 id += 1
-create_player(str(id), None, 'NewPlayer', player_image)
+player_a = create_player(str(id), None, 'NewPlayer', player_image)
 print('expected: NewPlayer got: ' + get_player_name(str(id)))
 
 id += 1
-create_player(None, 'newPlayer', 'NewPlayer', player_image)
+player_b = create_player(None, 'newPlayer', 'NewPlayer', player_image)
 print('expected: NewPlayer got: ' + get_player_name('newPlayer'))
+
+printn('Try changing the nickname.')
+player_b.nickname = 'NewNickName'
+print('expected: NewNickName got: ' + get_player_name('newPlayer'))
+
+printn('Create a new location')
+try:
+    proposal = create_location_proposal(player_a, location_image)
+    myloc = create_location(0, 0, 'Apeiros Town', 'The home of Inifinite Nomic', proposal, player_b)
+except LocationOverlapError:
+    print('Location overlap found.')
