@@ -56,9 +56,12 @@ def create_player(
     return player
 
 
-def get_player_name(unique_id: str) -> str:
+def get_player(unique_id: str) -> str:
     '''
-    Gets the identifying name of a player, either its nickname or username.
+    Gets a player, if they exist.
+
+    Raises:
+        PlayerNotFound: Player doesn't exist
 
     Args:
         unique_id (str): The unique id of a player object. This value is
@@ -72,7 +75,9 @@ def get_player_name(unique_id: str) -> str:
     player = db().get_player(unique_id)
 
     if player is None:
-        raise LookupError('No player found with that unique id.')
+        raise PlayerNotFound('No player found with that unique id.')
+
+    return player
 
     if player.nickname is not None:
         return player.nickname

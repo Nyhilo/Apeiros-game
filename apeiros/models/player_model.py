@@ -89,6 +89,13 @@ class Player(Base):
 
         return None
 
+    @property
+    def name(self) -> str:
+        if self.nickname is not None:
+            return self.nickname
+
+        return self.username
+
     def __repr__(self) -> str:
         return (
             f'Player(id={self.id!r}, unique_id={self.unique_id!r}, username={self.username!r}, '
