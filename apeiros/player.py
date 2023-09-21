@@ -1,6 +1,15 @@
 from .game import db
 from .models import Player
+from .models.enums import Direction
+from .exceptions import PlayerNotFound, BadMovementDirection, BadMovementDistance
 from .utilities import image
+
+
+NORTH = {Direction.North, 1, 'north', 'n', 'up', 'u'}
+EAST = {Direction.East, 2, 'east', 'e', 'right', 'r'}
+SOUTH = {Direction.South, 3, 'south', 's', 'down', 'd'}
+WEST = {Direction.West, 4, 'west', 'w', 'left', 'l'}
+VALID_MOVEMENT_DIRECTIONS = NORTH.union(EAST).union(SOUTH).union(WEST)
 
 
 def create_player(
@@ -79,11 +88,62 @@ def get_player(unique_id: str) -> str:
 
     return player
 
-    if player.nickname is not None:
-        return player.nickname
 
-    return player.username
+def move_player(player: Player, direction: Direction | str | int, distance: int = 1) -> int:
+    '''
+    Tries to move the player a certain number of squares in a gven direction.
+    Accepts the following directions:
+    North, East, South, West from apeiros.Direction.
+    The strings "North", "East", "South", or "West".
+    The strings "N", "E", "S", or "W"..
+    The strings "Up", "Right", "Down", or "Left".
+    The integers 1, 2, 3, or 4, corresponding to the directions N, E, S, and W.
+    All strings are non-case-sensitive.
 
+    Args:
+        direction (Direction | str | int): The direction to move.
+
+    Returns:
+        bool: The distance moved. Will be 0 if the move failed.
+    '''
+    # Validate the direction is a correct form
+    if type(direction) is str:
+        direction = direction.lower()
+
+    if direction not in VALID_MOVEMENT_DIRECTIONS:
+        raise BadMovementDirection(f'The given direction "{direction}" is not a valid movement direction.')
+
+    # Is our distance good?
+    if distance < 0:
+        raise ValueError('The distance to move must be greater than 1.')
+
+    # Convert input to vector
+    x, y = _normalize_direction(direction, distance)
+
+    # Because we only move in a straight line right now, one of these values
+    # will always stay the same (x or y will be 0)
+    dest_x, dest_y = player.x + x, player.y + y
+
+    # Check for blank locations along the x axis
+    for _x in range(dest_x, player.x, 1 if player.x > dest_x else -1):
+        if db().get_location(_x, player.y) is None:
+            raise BadMovementDistance("You can't move like that. There is an undiscovered location that way.")
+
+    # Check for blank locations along the y axis
+    for _y in range(dest_x, player.x, 1 if player.x > dest_x else -1):
+        if db().get_location(player.x, _y) is None:
+            raise BadMovementDistance("You can't move like that. There is an undiscovered location that way.")
+
+    # Teleport the player (nothing personal, kid)
+    player.x = dest_x
+    player.y = dest_y
+
+    return True
+
+
+#####################
+# Utility Functions #
+#####################
 
 # Written with Lily's help :)
 def _handle_user_identifiers(unique_id: str, username: str, nickname: str) -> (str, str, str):
@@ -118,3 +178,22 @@ def _handle_player_token(token: bytes, autocrop: bool = False) -> bytes:
         return image.autocrop(token)
 
     return token
+
+
+def _normalize_direction(direction: Direction | str | int, distance: int) -> (int, int):
+    '''
+    Converts a direction and a distance to a movement vector (x, y).
+    For example, a direction of "west" and a distance of 3 would result in the
+    vector (-3, 0)
+    '''
+    x, y = (0, 0)
+
+    if direction in NORTH or direction in SOUTH:
+        y = distance
+    else:   # East or West
+        x = distance
+
+    if direction in EAST or direction in SOUTH:
+        x, y = -x, -y
+
+    return (x, y)

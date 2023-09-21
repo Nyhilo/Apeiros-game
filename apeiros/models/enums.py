@@ -56,3 +56,10 @@ class LocationTag(str, Enum):
     Buildable = 'Buildable'
     Farm = 'Farm'
     Civilized = 'Civilized'
+
+
+class Direction(Enum):
+    North = 1,
+    East = 2,
+    South = 3,
+    West = 4
