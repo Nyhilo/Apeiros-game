@@ -170,7 +170,7 @@ def _handle_player_token(token: bytes, autocrop: bool = False) -> bytes:
     # We'll just convert the image just to make sure
     token = image.convert_png(token)
 
-    pixels_off, _ = image.check_square(token)
+    pixels_off, _, _, _ = image.check_square(token)
     if pixels_off > 0 and not autocrop:
         raise ValueError('Given player token image is not square.')
 

@@ -105,5 +105,3 @@ class LocationProposal(Base):
 
     submitter_id: Mapped[int] = mapped_column(ForeignKey('apeiros_players.id'))
     submitter = relationship('Player')
-
-    # TODO: Add column to track time created.

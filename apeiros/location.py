@@ -1,15 +1,32 @@
 from .game import db
 from .models import Player, Location, Tile, LocationProposal
 from .utilities import image
-from .exceptions import LocationOverlapError
+from .exceptions import ImageNotSquareError, LocationOverlapError
+from .config import squareness_percent_off_limit
 
 
 def create_location_proposal(
         submitter: Player,
         tile_image: bytes
 ) -> LocationProposal:
-    # TODO: Check for squareness on the tile
-    # TODO: Save to database with created timestamp
+    '''
+    Create a new proposal for a location. Checks for image squareness before accepting
+
+    Args:
+        submitter (Player): _description_
+        tile_image (bytes): _description_
+
+    Returns:
+        LocationProposal: _description_
+    '''
+
+    pixels_off, percent_off, w, h = image.check_square(tile_image)
+    if percent_off > squareness_percent_off_limit:
+        crop_direction = 'sides' if w > h else 'top/bottom'
+        raise ImageNotSquareError(f'Image is not square enough! We would need to crop {pixels_off} pixels off the '
+                                  f'{crop_direction} of the image in order to make it square. Please resize it and try '
+                                  'again')
+
     return LocationProposal(tile_image=Tile(image=tile_image), submitter=submitter)
 
 

@@ -9,12 +9,13 @@ from PIL import Image
 IMAGE_FORMAT = 'PNG'
 
 
-def check_square(image: bytes) -> (int, int):
+def check_square(image: bytes) -> (int, int, int, int):
     '''
     Checks how square the image is. Returns a tuple indicating how many pixels
-     the image is off from being square and the percentage of the difference
-     from the short-side of the image. For instance, an image of size 200x210
-     would report return (pixels, percent) = (10, 5).
+     the image is off from being square, the percentage of the difference from
+     the short-side of the image, and the given width and height of the image.
+     For instance, an image of size 200x210 would report return
+     (pixels, percent, width, height) = (10, 5, 200, 210).
 
     Args:
         image (bytes): An image byte-input. Should be a png formatted image.
@@ -29,7 +30,7 @@ def check_square(image: bytes) -> (int, int):
     width, height = img.size
     diff = abs(width - height)
     percent = 0 if diff == 0 else int((diff / min(width, height)) * 100)
-    return diff, percent
+    return diff, percent, width, height
 
 
 # TODO: Consider supporting/using WebP instead
@@ -49,7 +50,6 @@ def convert_png(image: bytes) -> bytes:
         return image
 
     return _save_image_to_memory(img)
-
 
 
 def autocrop(image: bytes) -> bytes:

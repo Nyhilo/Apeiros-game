@@ -21,3 +21,12 @@ class LocationOverlapError(Exception):
     already contains a location.
     '''
     pass
+
+
+# Image Exceptions #
+class ImageNotSquareError(Exception):
+    '''
+    Thrown when a given image does not fall within the configured squareness
+    requirements.
+    '''
+    pass
